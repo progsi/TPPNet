@@ -7,13 +7,15 @@ import os
 from multiprocessing import Pool
 from tqdm import tqdm
 
-in_dir = 'crawl_data/data/'
-out_dir = 'youtube_cqt_npy/'
+in_dir = 'data/crawl_data/'
+out_dir = 'data/youtube_cqt_npy/'
 
 
 def CQT(args):
     try:
         in_path, out_path = args
+        print(in_path)
+        print(out_path)
         data, sr = librosa.load(in_path)
         if len(data)<1000:
             return
@@ -31,7 +33,7 @@ def CQT(args):
         
 params =[]
 for ii, (root, dirs, files) in tqdm(enumerate(os.walk(in_dir))):  
-    if ii < 5000: continue
+    # if ii < 5000: continue
     if len(files):
         for file in files:
             in_path = os.path.join(root,file)
@@ -40,6 +42,9 @@ for ii, (root, dirs, files) in tqdm(enumerate(os.walk(in_dir))):
             params.append((in_path, out_path))
 
 print('begin')
+print(in_dir)
+print(os.getcwd())
+print(params)
 pool = Pool(40)
 pool.map(CQT, params)
 pool.close()

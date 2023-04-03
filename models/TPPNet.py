@@ -184,6 +184,7 @@ class CQTTPPNet(BasicModule):
     def forward(self, x):
         # input [N, C, H, W] (W = 396)
         N = x.size()[0]
+        print(x.shape)
         x = self.features(x) # [N, 128, 1, W - 75 + 1]
         x = self.conv(x) #  [N, 256, 1, W - 75 +1 - 3 + 1]
         x = SPP(x, [4,3,2,1]) # [N, 256, 1, sum()=79]

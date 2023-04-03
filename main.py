@@ -333,7 +333,8 @@ def test(**kwargs):
 
     if not opt.full_test == True:
         test_data = CQT('shs-yt-1300', out_length=None)
-        val_quick(model, test_data)
+        test_dataloader = DataLoader(test_data, 1, shuffle=False,num_workers=1)
+        val_quick(model, test_dataloader)
     else:
         # val_data350 = CQT('songs350', out_length=None)
         val_data80 = CQT('songs80', out_length=None)

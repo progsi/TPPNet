@@ -5,6 +5,7 @@ import torch as t
 class DefaultConfig(object):
 
     model = 'CQTTPPNet'  # 使用的模型，名字必须与models/__init__.py中的名字一致
+    # model = 'CQT300Net'  # 使用的模型，名字必须与models/__init__.py中的名字一致
     feature = 'cqt'
     full_test = False # sh: to prevent use of all datasets
     load_model_path = None  # 加载预训练的模型的路径，为None代表不加载

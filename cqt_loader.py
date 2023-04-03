@@ -100,10 +100,15 @@ class CQT(Dataset):
             set_id, version_id = filename[:idx], filename[idx+1:]
             
             h5_file = h5py.File(self.indir + 'cqt.h5')
-            data = np.array(h5_file[version_id + '/' + 'cqt'])
+            data = np.array(h5_file[version_id + '/' + 'cqt']).T
 
             # downsampling
             def downsampling(cqt):
+                if len(cqt)<1000:
+                    print("minor length")
+                    print(cqt.shape)
+                    return
+                cqt = np.abs(cqt)
                 mean_size = 20
                 height, length = cqt.shape
                 new_cqt = np.zeros((height, int(length/mean_size)),dtype=np.float64)
@@ -111,7 +116,7 @@ class CQT(Dataset):
                     new_cqt[:,i] = cqt[:,i*mean_size:(i+1)*mean_size].mean(axis=1) 
                 return new_cqt
                 
-            data = downsampling(data)[np.newaxis, :]
+            data = downsampling(data)#[np.newaxis, :]
             h5_file.close()
         else:
             filename = self.file_list[index].strip()
