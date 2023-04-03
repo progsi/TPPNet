@@ -8,6 +8,7 @@ import random
 import bisect
 import torchvision
 import PIL
+import h5py
 
 def cut_data(data, out_length):
     if out_length is not None:
@@ -47,14 +48,14 @@ class CQT(Dataset):
         self.indir = 'data/youtube_cqt_npy/'
         self.mode=mode
         if mode == 'train': 
-            filepath='data/SHS100K-TRAIN_6'
+            filepath='data/SHS100K-TRAIN_6.txt'
         elif mode == 'val':
-            filepath='data/SHS100K-VAL'
+            filepath='data/SHS100K-VAL.txt'
         elif mode == 'songs350': 
             self.indir = 'data/you350_cqt_npy/'
             filepath='data/you350_list.txt'
         elif mode == 'test': 
-            filepath='data/SHS100K-TEST'
+            filepath='data/SHS100K-TEST.txt'
         elif mode == 'songs80': 
             self.indir = 'data/covers80_cqt_npy/'
             filepath = 'data/songs80_list.txt'
@@ -67,6 +68,10 @@ class CQT(Dataset):
         elif mode == 'Mazurkas':
             self.indir = 'data/Mazurkas_cqt_npy/'
             filepath = 'data/Mazurkas_list.txt'
+        elif mode == 'shs-yt-1300':
+            self.indir = '../shs_yt_1300/data/'
+            
+            filepath = 'data/shs-yt-1300.txt'
         with open(filepath, 'r') as fp:
             self.file_list = [line.rstrip() for line in fp]
         self.out_length = out_length
@@ -88,11 +93,32 @@ class CQT(Dataset):
             lambda x : torch.Tensor(x),
             lambda x : x.permute(1,0).unsqueeze(0),
         ])
-        filename = self.file_list[index].strip()
-        set_id, version_id = filename.split('.')[0].split('_')
-        set_id, version_id = int(set_id), int(version_id)
-        in_path = self.indir+filename+'.npy'
-        data = np.load(in_path) # from 12xN to Nx12
+
+        if self.mode == 'shs-yt-1300':
+            filename = self.file_list[index].strip()
+            idx = filename.index('_')
+            set_id, version_id = filename[:idx], filename[idx+1:]
+            
+            h5_file = h5py.File(self.indir + 'cqt.h5')
+            data = np.array(h5_file[version_id + '/' + 'cqt'])
+
+            # downsampling
+            def downsampling(cqt):
+                mean_size = 20
+                height, length = cqt.shape
+                new_cqt = np.zeros((height, int(length/mean_size)),dtype=np.float64)
+                for i in range(int(length/mean_size)):
+                    new_cqt[:,i] = cqt[:,i*mean_size:(i+1)*mean_size].mean(axis=1) 
+                return new_cqt
+                
+            data = downsampling(data)[np.newaxis, :]
+            h5_file.close()
+        else:
+            filename = self.file_list[index].strip()
+            set_id, version_id = filename.split('.')[0].split('_')
+            set_id, version_id = int(set_id), int(version_id)
+            in_path = self.indir+filename+'.npy'
+            data = np.load(in_path) # from 12xN to Nx12
 
         if self.mode is 'train':
             data = transform_train(data)

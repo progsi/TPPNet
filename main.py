@@ -323,31 +323,37 @@ def test(**kwargs):
     
     model = getattr(models, opt.model)() 
     #print(model)
+    
     if opt.load_latest is True:
         model.load_latest(opt.notes)
     elif opt.load_model_path:
-        model.load(opt.load_model_path)
+        model.load(opt.load_model_path, opt.device)
+    
     model.to(opt.device)
 
-    val_data350 = CQT('songs350', out_length=None)
-    val_data80 = CQT('songs80', out_length=None)
-    val_data = CQT('val', out_length=None)
-    test_data = CQT('test', out_length=None)
-    val_data2000 = CQT('songs2000', out_length=None)
-    val_datatMazurkas = CQT('Mazurkas', out_length=None)
-    val_dataloader = DataLoader(val_data, 1, shuffle=False,num_workers=1)
-    test_dataloader = DataLoader(test_data, 1, shuffle=False,num_workers=1)
-    val_dataloader80 = DataLoader(val_data80, 1, shuffle=False, num_workers=1)
-    val_dataloader350 = DataLoader(val_data350, 1, shuffle=False, num_workers=1)
-    val_dataloader2000 = DataLoader(val_data2000, 1, shuffle=False, num_workers=1)
-    val_dataloaderMazurkas = DataLoader(val_datatMazurkas,1, shuffle=False,num_workers=1)
+    if not opt.full_test == True:
+        test_data = CQT('shs-yt-1300', out_length=None)
+        val_quick(model, test_data)
+    else:
+        # val_data350 = CQT('songs350', out_length=None)
+        val_data80 = CQT('songs80', out_length=None)
+        val_data = CQT('val', out_length=None)
+        test_data = CQT('test', out_length=None)
+        val_data2000 = CQT('songs2000', out_length=None)
+        val_datatMazurkas = CQT('Mazurkas', out_length=None)
+        val_dataloader = DataLoader(val_data, 1, shuffle=False,num_workers=1)
+        test_dataloader = DataLoader(test_data, 1, shuffle=False,num_workers=1)
+        val_dataloader80 = DataLoader(val_data80, 1, shuffle=False, num_workers=1)
+        # val_dataloader350 = DataLoader(val_data350, 1, shuffle=False, num_workers=1)
+        val_dataloader2000 = DataLoader(val_data2000, 1, shuffle=False, num_workers=1)
+        val_dataloaderMazurkas = DataLoader(val_datatMazurkas,1, shuffle=False,num_workers=1)
     
-    val_slow(model, val_dataloader350, 0)
-    val_slow(model, val_dataloader80, 0)
-    val_slow(model, val_dataloader2000,0)
-    val_slow(model, val_dataloaderMazurkas, 0)
-    val_quick(model, val_dataloader)
-    val_quick(model, test_dataloader)
+        # val_slow(model, val_dataloader350, 0)
+        val_slow(model, val_dataloader80, 0)
+        val_slow(model, val_dataloader2000,0)
+        val_slow(model, val_dataloaderMazurkas, 0)
+        val_quick(model, val_dataloader)
+        val_quick(model, test_dataloader)
     
     
 def multi_test(**kwargs):
