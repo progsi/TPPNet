@@ -1,3 +1,8 @@
 config.py
 config.py
 stderr.txt
+.gitignore
+main.sub
+test.log
+stdout.txt
+conda_activate.sh
