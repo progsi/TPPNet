@@ -104,10 +104,9 @@ class CQT(Dataset):
 
             # downsampling
             def downsampling(cqt):
-                if len(cqt)<1000:
-                    print("minor length")
-                    print(cqt.shape)
-                    return
+                # if len(cqt)<1000:
+                #    print("minor length")
+                #     return
                 cqt = np.abs(cqt)
                 mean_size = 20
                 height, length = cqt.shape
