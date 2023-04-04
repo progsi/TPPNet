@@ -280,7 +280,6 @@ def val_slow(model, dataloader, epoch):
     return MAP
 
     
-    
 @torch.no_grad()
 def val_quick(model, dataloader,note=None):
     print('-----------------------------')
