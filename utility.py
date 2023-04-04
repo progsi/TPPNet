@@ -49,5 +49,25 @@ def calc_MAP(array2d, version, que_range=None, K=1e10):
     return MAP / float(que_t - que_s), top10 / float(que_t - que_s) / 10, rank1 / float(que_t - que_s)
 
 
+def compute_map(X, labels):
+    
+    from sklearn.preprocessing import LabelBinarizer
+    from sklearn.metrics import average_precision_score
+    # Convert labels to binary matrix
+    lb = LabelBinarizer()
+    Y_true = lb.fit_transform(labels)
+
+    # Compute pairwise similarity matrix
+    sim_mat = X / np.max(X, axis=1, keepdims=True)
+
+    # Compute AP for each class
+    ap_scores = []
+    for c in range(Y_true.shape[1]):
+        ap = average_precision_score(Y_true[:, c], sim_mat[:, c])
+        ap_scores.append(ap)
+
+    # Compute MAP
+    map_score = np.mean(ap_scores)
+    return map_score
 
 

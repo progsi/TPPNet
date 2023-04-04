@@ -70,8 +70,10 @@ class CQT(Dataset):
             filepath = 'data/Mazurkas_list.txt'
         elif mode == 'shs-yt-1300':
             self.indir = '../shs_yt_1300/data/'
-            
             filepath = 'data/shs-yt-1300.txt'
+        elif mode == 'shs-yt-1300-ext':
+            self.indir = '../shs_yt_1300/data/'
+            filepath = 'data/shs-yt-1300-ext.txt'
         with open(filepath, 'r') as fp:
             self.file_list = [line.rstrip() for line in fp]
         self.out_length = out_length
@@ -94,14 +96,18 @@ class CQT(Dataset):
             lambda x : x.permute(1,0).unsqueeze(0),
         ])
 
-        if self.mode == 'shs-yt-1300':
+        if self.mode == 'shs-yt-1300' or self.mode == 'shs-yt-1300-ext':
             filename = self.file_list[index].strip()
             idx = filename.index('_')
             set_id, version_id = filename[:idx], filename[idx+1:]
             
             h5_file = h5py.File(self.indir + 'cqt.h5')
-            data = np.array(h5_file[version_id + '/' + 'cqt']).T
-
+            try:
+                data = np.array(h5_file[version_id + '/' + 'cqt']).T
+            except:
+                # gen a dummy tensor with nans
+                data = np.full((3000, 84), np.nan)
+                
             # downsampling
             def downsampling(cqt):
                 # if len(cqt)<1000:

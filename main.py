@@ -213,7 +213,7 @@ def multi_val_slow(model, dataloader1,dataloader2, epoch):
     labels, features,features2 = None, None, None
     for ii, (data, label) in enumerate(dataloader1):
         input = data.to(opt.device)
-        #print(input.shape)
+        # print(input.shape)
         score, feature = model(input)
         feature = feature.data.cpu().numpy()
         label = label.data.cpu().numpy()
@@ -225,7 +225,7 @@ def multi_val_slow(model, dataloader1,dataloader2, epoch):
             labels = label
     for ii, (data, label) in enumerate(dataloader2):
         input = data.to(opt.device)
-        #print(input.shape)
+        # print(input.shape)
         score, feature = model(input)
         feature = feature.data.cpu().numpy()
         if features2 is not None:
@@ -240,8 +240,10 @@ def multi_val_slow(model, dataloader1,dataloader2, epoch):
         MAP, top10, rank1 = calc_MAP(dis2d, labels,[100, 350])
     else :
         MAP, top10, rank1 = calc_MAP(dis2d, labels)
+        MAP2 = compute_map(dis2d, labels)
 
     print(epoch, MAP, top10, rank1 )
+    print(MAP2)
     model.train()
     return MAP
 
@@ -254,7 +256,7 @@ def val_slow(model, dataloader, epoch):
 
     for ii, (data, label) in enumerate(dataloader):
         input = data.to(opt.device)
-        #print(input.shape)
+        # print(input.shape)
         score, feature = model(input)
         feature = feature.data.cpu().numpy()
         label = label.data.cpu().numpy()
@@ -274,8 +276,12 @@ def val_slow(model, dataloader, epoch):
     #elif len(labels) == 160:    MAP, top10, rank1 = calc_MAP(dis2d, labels,[80, 160])
     else :
         MAP, top10, rank1 = calc_MAP(dis2d, labels)
+        # MAP2 = compute_map(dis2d, labels)
+        np.save('hpcp/10/dis2d.npy', dis2d)
+        np.save('hpcp/10/labels.npy', labels)
 
     print(epoch, MAP, top10, rank1 )
+    # print(MAP2)
     model.train()
     return MAP
 
@@ -321,7 +327,7 @@ def test(**kwargs):
     opt._parse(kwargs)
     
     model = getattr(models, opt.model)() 
-    #print(model)
+    # print(model)
     
     if opt.load_latest is True:
         model.load_latest(opt.notes)
@@ -333,7 +339,10 @@ def test(**kwargs):
     if not opt.full_test == True:
         test_data = CQT('shs-yt-1300', out_length=None)
         test_dataloader = DataLoader(test_data, 1, shuffle=False,num_workers=1)
-        val_quick(model, test_dataloader)
+        test_data_ext = CQT('shs-yt-1300-ext', out_length=None)
+        test_dataloader_ext = DataLoader(test_data_ext, 1, shuffle=False,num_workers=1)
+        val_slow(model, test_dataloader, 0)
+        val_slow(model, test_dataloader_ext, 0)
     else:
         # val_data350 = CQT('songs350', out_length=None)
         val_data80 = CQT('songs80', out_length=None)
