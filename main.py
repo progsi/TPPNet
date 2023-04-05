@@ -249,7 +249,7 @@ def multi_val_slow(model, dataloader1,dataloader2, epoch):
 
     
 @torch.no_grad()
-def val_slow(model, dataloader, epoch):
+def val_slow(model, dataloader, epoch, ext_mode=False):
     model.eval()
     total, correct = 0, 0
     labels, features = None, None
@@ -277,8 +277,12 @@ def val_slow(model, dataloader, epoch):
     else :
         MAP, top10, rank1 = calc_MAP(dis2d, labels)
         # MAP2 = compute_map(dis2d, labels)
-        np.save('hpcp/10/dis2d.npy', dis2d)
-        np.save('hpcp/10/labels.npy', labels)
+        if ext_mode:
+            ext = '-ext'
+        else:
+            ext = ''
+        np.save(f"hpcp/10/dis2d{ext}.npy", dis2d)
+        np.save(f"hpcp/10/labels{ext}.npy", labels)
 
     print(epoch, MAP, top10, rank1 )
     # print(MAP2)
@@ -342,7 +346,7 @@ def test(**kwargs):
         test_data_ext = CQT('shs-yt-1300-ext', out_length=None)
         test_dataloader_ext = DataLoader(test_data_ext, 1, shuffle=False,num_workers=1)
         val_slow(model, test_dataloader, 0)
-        val_slow(model, test_dataloader_ext, 0)
+        val_slow(model, test_dataloader_ext, 0, True)
     else:
         # val_data350 = CQT('songs350', out_length=None)
         val_data80 = CQT('songs80', out_length=None)
