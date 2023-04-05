@@ -16,8 +16,8 @@ You can utilize "data/gencqt.py" to get CQT features from your own audio.
 
 ## Train 
 
-python main.py multi_train --model='CQTTPPNet' --batch_size=32 --load_latest=False --notes='experiment0'
+`python main.py multi_train --model 'CQTTPPNet' --batch_size 32 --load_latest False --notes 'experiment0'`
 
 ## Test
 
-python main.py test --model='CQTTPPNet' --load_model_path = 'check_points/best.pth'
+`python main.py test --model 'CQTTPPNet' --load_model_path 'check_points/best.pth'`

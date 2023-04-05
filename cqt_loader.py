@@ -98,16 +98,16 @@ class CQT(Dataset):
 
         if self.mode == 'shs-yt-1300' or self.mode == 'shs-yt-1300-ext':
             filename = self.file_list[index].strip()
-            idx = filename.index('_')
-            set_id, version_id = filename[:idx], filename[idx+1:]
+            filename_list = filename.split('?')
+            set_id, version_id = filename_list[0], filename_list[1]
             
             h5_file = h5py.File(self.indir + 'cqt.h5')
             try:
-                data = np.array(h5_file[version_id + '/' + 'cqt']).T
+                data = np.array(h5_file[version_id + '/' + 'cqt'][:]).T
             except:
                 # gen a dummy tensor with nans
+                print("generating dummy tensor")
                 data = np.full((3000, 84), np.nan)
-                
             # downsampling
             def downsampling(cqt):
                 # if len(cqt)<1000:
